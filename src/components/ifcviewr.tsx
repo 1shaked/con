@@ -39,7 +39,7 @@ export function IfcViewer() {
             // Setup file input handler
             const input = document.getElementById("ifcInput");
             input?.addEventListener("change", async (e) => {
-                const file = e.target?.files[0];
+                const file = (e.target as HTMLInputElement)?.files?.[0];
                 if (!file) return;
                 const buffer = await file.arrayBuffer();
                 const bytes = new Uint8Array(buffer);
