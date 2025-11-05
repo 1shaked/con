@@ -156,7 +156,13 @@ export function IfcTest() {
             if (existingPanel) {
                 existingPanel.remove();
             }
-            document.body.append(panel);
+            panel.style.position = "absolute";
+            panel.style.top = "1rem";
+            panel.style.right = "1rem";
+            panel.style.zIndex = "10";        // above the canvas
+            panel.classList.add("options-menu");
+            (containerRef.current as HTMLElement).append(panel);
+            // document.body.append(panel);
             
             return {components, world, panel};
 
@@ -177,7 +183,7 @@ export function IfcTest() {
     }, []);
 
     return (
-        <div className="w-full">
+        <div className="">
             <input
                 id="ifcInput"
                 type="file"
@@ -192,7 +198,7 @@ export function IfcTest() {
                     disabled:opacity-50
                 "
             />
-            <div ref={containerRef} style={{ width: '100%', height: '100vh' }} />
+            <div ref={containerRef} className='relative h-[70dvh]'/>
         </div>
     );
 }
