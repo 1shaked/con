@@ -43,26 +43,6 @@ export function IfcViewer() {
             // Setup file input handler
             const input = document.getElementById("ifcInput");
             input?.addEventListener("change", async (e) => {
-                // const file = (e.target as HTMLInputElement)?.files?.[0];
-                // if (!file) return;
-                // const buffer = await file.arrayBuffer();
-                // const bytes = new Uint8Array(buffer);
-                // const fragmentBytes = await serializer.process({
-                //     bytes,
-                //     progressCallback: (progress, data) => console.log(progress, data),
-                // });
-                // const model = await fragments.load(fragmentBytes, { modelId: file.name });
-                // // @ts-expect-error the parameter does exist and needed here
-                // model.useCamera(world.camera.three);
-                // world.scene.three.add(model.object);
-                // await fragments.update(true);
-                // const items = await model.getItemsOfCategories([/IFCWALL/, /IFCSLAB/]);
-                // const attrs = await model.getAttributeTypes()
-                // console.log(items);
-                // console.log(attrs);
-                
-                // const props = await model.getItemsWithGeometry();
-                // console.log(props);
                 fileSelected(e, serializer);
             });
             async function fileSelected (e: Event, serializer: FRAGS.IfcImporter) {
