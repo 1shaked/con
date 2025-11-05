@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react';
 import * as OBC from "@thatopen/components";
 import * as FRAGS from "@thatopen/fragments";
 import * as THREE from "three";
+import * as BUI from "@thatopen/ui";
 
 export function IfcViewer() {
     const containerRef = useRef(null);
@@ -9,7 +10,6 @@ export function IfcViewer() {
     useEffect(() => {
         async function init() {
             const components = new OBC.Components();
-            const casters = components.get(OBC.Raycasters);
             const worlds = components.get(OBC.Worlds);
             const world = worlds.create();
 
@@ -46,6 +46,44 @@ export function IfcViewer() {
                 fileSelected(e, serializer, world, fragments);
             });
 
+            BUI.Manager.init();
+
+            const [panel, updatePanel] = BUI.Component.create<BUI.PanelSection, {}>((_) => {
+                let downloadBtn: BUI.TemplateResult | undefined;
+                if (fragments.list.size > 0) {
+                    downloadBtn = BUI.html`
+      <bim-button label="Download Fragments" @click=${downloadFragments}></bim-button>
+    `;
+                }
+
+                let loadBtn: BUI.TemplateResult | undefined;
+                if (fragments.list.size === 0) {
+                    const onLoadIfc = async ({ target }: { target: BUI.Button }) => {
+                        target.label = "Conversion in progress...";
+                        target.loading = true;
+                        await loadIfc("https://thatopen.github.io/engine_components/resources/ifc/school_str.ifc");
+                        target.loading = false;
+                        target.label = "Load IFC";
+                    };
+
+                    loadBtn = BUI.html`
+      <bim-button label="Load IFC" @click=${onLoadIfc}></bim-button>
+      <bim-label>Open the console to see the progress!</bim-label>
+    `;
+                }
+
+                return BUI.html`
+    <bim-panel active label="IfcLoader Tutorial" class="options-menu">
+      <bim-panel-section label="Controls">
+        ${loadBtn}
+        ${downloadBtn}
+      </bim-panel-section>
+    </bim-panel>
+  `;
+            }, {});
+
+            document.body.append(panel);
+            fragments.list.onItemSet.add(() => updatePanel());
         }
         init();
     }, []);
