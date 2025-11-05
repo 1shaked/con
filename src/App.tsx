@@ -6,7 +6,6 @@ function App() {
   return (
     <>
       <div className="w-full">
-        Hello, LeanCon!!
         <IfcTest />
       </div>
     </>

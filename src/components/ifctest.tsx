@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import * as OBC from "@thatopen/components";
-import * as FRAGS from "@thatopen/fragments";
-import * as THREE from "three";
+// import * as FRAGS from "@thatopen/fragments";
+// import * as THREE from "three";
 import * as BUI from "@thatopen/ui";
 
 export function IfcTest() {
@@ -63,8 +63,8 @@ export function IfcTest() {
 
             const finder = components.get(OBC.ItemsFinder);
             finder.create("WALL", [{ categories: [/WALL/] }]);
-            finder.create("DOOR", [{ categories: [/DOOR/, /WINDOW/, /SLAB/] }]);
-            finder.create("WINDOW", [{ categories: [/WINDOW/, /SLAB/] }]);
+            finder.create("DOOR", [{ categories: [/DOOR/ ] }]);
+            finder.create("WINDOW", [{ categories: [/WINDOW/] }]);
             finder.create("SLAB", [{ categories: [/SLAB/] }]);
 
 
@@ -203,6 +203,7 @@ export function IfcTest() {
     );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export async function loadIFCFile(file: File, ifcLoader: OBC.IfcLoader, name: string = "IFCModel") {
     // const file = await fetch(path);
     // const data = await file.arrayBuffer();
@@ -215,6 +216,7 @@ export async function loadIFCFile(file: File, ifcLoader: OBC.IfcLoader, name: st
     });
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export async function getResult(name: string, finder: OBC.ItemsFinder) {
     const finderQuery = finder.list.get(name);
     if (!finderQuery) return {};
