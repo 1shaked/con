@@ -39,51 +39,16 @@ export function IfcViewer() {
             // Setup Fragments
             const fragments = new FRAGS.FragmentsModels("/src/worker.mjs");
             world.camera.controls?.addEventListener("rest", () => fragments.update(true));
-
+            
             // Setup file input handler
             const input = document.getElementById("ifcInput");
             input?.addEventListener("change", async (e) => {
                 fileSelected(e, serializer, world, fragments);
             });
+            
+            // BUI.Manager.init();
 
-            BUI.Manager.init();
-
-            const [panel, updatePanel] = BUI.Component.create<BUI.PanelSection, {}>((_) => {
-                let downloadBtn: BUI.TemplateResult | undefined;
-                if (fragments.list.size > 0) {
-                    downloadBtn = BUI.html`
-      <bim-button label="Download Fragments" @click=${downloadFragments}></bim-button>
-    `;
-                }
-
-                let loadBtn: BUI.TemplateResult | undefined;
-                if (fragments.list.size === 0) {
-                    const onLoadIfc = async ({ target }: { target: BUI.Button }) => {
-                        target.label = "Conversion in progress...";
-                        target.loading = true;
-                        await loadIfc("https://thatopen.github.io/engine_components/resources/ifc/school_str.ifc");
-                        target.loading = false;
-                        target.label = "Load IFC";
-                    };
-
-                    loadBtn = BUI.html`
-      <bim-button label="Load IFC" @click=${onLoadIfc}></bim-button>
-      <bim-label>Open the console to see the progress!</bim-label>
-    `;
-                }
-
-                return BUI.html`
-    <bim-panel active label="IfcLoader Tutorial" class="options-menu">
-      <bim-panel-section label="Controls">
-        ${loadBtn}
-        ${downloadBtn}
-      </bim-panel-section>
-    </bim-panel>
-  `;
-            }, {});
-
-            document.body.append(panel);
-            fragments.list.onItemSet.add(() => updatePanel());
+            
         }
         init();
     }, []);
