@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import * as OBC from "@thatopen/components";
 // import * as FRAGS from "@thatopen/fragments";
 // import * as THREE from "three";
@@ -12,6 +12,7 @@ import { queriesListTemplate } from '../utils/Queries_List_Template';
 import { useQuery } from '@tanstack/react-query';
 import { URL_SERVER } from '../consts';
 import { Server_File_Info_Schema } from '../validators/Server_File_Info_Schema';
+import { Server_GUIDS_For_Type_Schema } from '../validators/Server_GUIDS_For_Type';
 
 
 export function IfcTest() {
@@ -23,6 +24,7 @@ export function IfcTest() {
     const castersRef = useRef<OBC.Raycasters | null>(null);
     const ifcLoaderRef = useRef<OBC.IfcLoader | null>(null);
     const casterRef = useRef<OBC.SimpleRaycaster | null>(null);
+    const [file, setFile] = useState<File | null>(null);
     const model_data = useQuery({
         queryKey: ['model_data'],
         queryFn: async () => {
@@ -94,7 +96,22 @@ export function IfcTest() {
             input?.addEventListener("change", async (e) => {
                 const file = (e.target as HTMLInputElement).files?.[0];
                 if (!file) return;
+                setFile(file);
                 await loadIFCFile(file, ifcLoader, file.name);
+                const form = new FormData();
+                form.append("ifc_file", file);
+                await fetch(`${URL_SERVER}upload_ifc/`, {
+                    method: 'POST',
+                    body: form  
+                });
+                // target_type_name = "M_Concrete-Rectangular Beam:400 x 800mm"
+                // target_level_name = "03 - Floor"  # or “Level 03” / “03 – Floor” depending on how the IFC storey is named
+                form.append("element_type", "M_Concrete-Rectangular Beam:400 x 800mm");
+                form.append("level_name", "03 - Floor");
+                await fetch(`${URL_SERVER}get_guids/`, {
+                    method: 'POST',
+                    body: form
+                });
             });
 
             const finder = components.get(OBC.ItemsFinder);
@@ -223,9 +240,22 @@ export function IfcTest() {
             />
             <button
                 id='test' onClick={async () => {
-                    const modelIdMap = await fragmentsRef.current?.guidsToModelIdMap(['2UD3D7uxP8kecbbBCRtz3R', '2UD3D7uxP8kecbbBCRtzBk',
-                        '18YHwga450Mw4Fy6M5t_8r'
-                    ])
+                    const form = new FormData();
+                    form.append("element_type", "M_Concrete-Rectangular Beam:400 x 800mm");
+                    form.append("level_name", "03 - Floor");
+                    form.append("ifc_file", file as Blob);
+                    const res = await fetch(`${URL_SERVER}get_guids/`, {
+                        method: 'POST',
+                        body: form
+                    });
+                    const data = await res.json();
+                    const validateData = Server_GUIDS_For_Type_Schema.safeParse(data);
+                    if (!validateData.success) {
+                        console.error("Invalid data:", validateData.error);
+                        return;
+                    }
+                    console.log("Validated GUIDs Data:", validateData.data);
+                    const modelIdMap = await fragmentsRef.current?.guidsToModelIdMap(validateData.data.guids)
                     await fragmentsRef.current?.highlight({
                         color: new THREE.Color("purple"),
                         renderedFaces: RenderedFaces.ONE,
@@ -233,6 +263,16 @@ export function IfcTest() {
                         transparent: false
                     }, modelIdMap);
                     await fragmentsRef.current?.core.update(true);
+                    // const modelIdMap = await fragmentsRef.current?.guidsToModelIdMap(['2UD3D7uxP8kecbbBCRtz3R', '2UD3D7uxP8kecbbBCRtzBk',
+                    //     '18YHwga450Mw4Fy6M5t_8r'
+                    // ])
+                    // await fragmentsRef.current?.highlight({
+                    //     color: new THREE.Color("purple"),
+                    //     renderedFaces: RenderedFaces.ONE,
+                    //     opacity: 0.5,
+                    //     transparent: false
+                    // }, modelIdMap);
+                    // await fragmentsRef.current?.core.update(true);
                 }}>test viewpoint</button>
             <div ref={containerRef} className='relative h-[70dvh] rounded-lg border border-gray-200 shadow-lg overflow-hidden' onDoubleClick={async () => {
 
