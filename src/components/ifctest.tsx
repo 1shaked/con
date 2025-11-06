@@ -7,6 +7,8 @@ import * as THREE from "three";
 import { RenderedFaces } from '@thatopen/fragments';
 import { loadIFCFile } from '../utils/Load_IFC_File';
 import { getFinderFilterResult } from '../utils/Get_Finder_Filter_Result';
+import type { TQueriesListTableData } from '../types/QueriesListTableData';
+import { queriesListTemplate } from '../utils/Queries_List_Template';
 
 
 export function IfcTest() {
@@ -95,38 +97,10 @@ export function IfcTest() {
                 isInitializedRef.current = true;
             }
 
-            type QueriesListTableData = {
-                Name: string;
-                Actions: string;
-            };
-
-            function queriesListTemplate(finder: OBC.ItemsFinder) {
-                const onCreated = (e?: Element) => {
-                    if (!e) return;
-                    const table = e as BUI.Table<QueriesListTableData>;
-
-                    table.loadFunction = async () => {
-                        const data: BUI.TableGroupData<QueriesListTableData>[] = [];
-
-                        for (const [name] of finder.list) {
-                            data.push({
-                                data: { Name: name, Actions: "" },
-                            });
-                        }
-
-                        return data;
-                    };
-
-                    table.loadData(true);
-                };
-
-                return BUI.html`
-                    <bim-table ${BUI.ref(onCreated)}></bim-table>
-                `;
-            };
+            
 
             const queriesList =
-                BUI.Component.create<BUI.Table<QueriesListTableData>>(() => queriesListTemplate(finder));
+                BUI.Component.create<BUI.Table<TQueriesListTableData>>(() => queriesListTemplate(finder));
 
             queriesList.style.maxHeight = "25rem";
             queriesList.columns = ["Name", { name: "Actions", width: "auto" }];
