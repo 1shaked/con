@@ -1,18 +1,29 @@
 import { useRef, useEffect } from 'react';
 import * as OBC from "@thatopen/components";
-import * as FRAGS from "@thatopen/fragments";
+// import * as FRAGS from "@thatopen/fragments";
 // import * as THREE from "three";
 import * as BUI from "@thatopen/ui";
 import * as THREE from "three";
 import { RenderedFaces } from '@thatopen/fragments';
+import { loadIFCFile } from '../utils/Load_IFC_File';
+import { getFinderFilterResult } from '../utils/Get_Finder_Filter_Result';
+
 
 export function IfcTest() {
     const containerRef = useRef(null);
     const isInitializedRef = useRef(false);
+    const componentsRef = useRef<OBC.Components | null>(null);
+    const worldRef = useRef<OBC.Worlds | null>(null);
+    const fragmentsRef = useRef<OBC.FragmentsManager | null>(null);
+    const castersRef = useRef<OBC.Raycasters | null>(null);
+    const ifcLoaderRef = useRef<OBC.IfcLoader | null>(null);
+    const casterRef = useRef<OBC.SimpleRaycaster | null>(null);
     useEffect(() => {
         async function init() {
             const components = new OBC.Components();
+            componentsRef.current = components;
             const worlds = components.get(OBC.Worlds);
+            worldRef.current = worlds;
             const world = worlds.create<
                 OBC.SimpleScene,
                 OBC.OrthoPerspectiveCamera,
@@ -32,10 +43,13 @@ export function IfcTest() {
             const grids = components.get(OBC.Grids);
             grids.create(world);
             const casters = components.get(OBC.Raycasters);
+            castersRef.current = casters;
             components.init();
             const caster = casters.get(world);
+            casterRef.current = caster 
             
             const fragments = components.get(OBC.FragmentsManager);
+            fragmentsRef.current = fragments;
             fragments.init("/src/worker.mjs");
             
             // set fragment that when a model is added, it is added to the scene and linked to the camera
@@ -49,6 +63,7 @@ export function IfcTest() {
 
             // Setup IfcImporter
             const ifcLoader = components.get(OBC.IfcLoader);
+            ifcLoaderRef.current = ifcLoader;
             await ifcLoader.setup({
                 autoSetWasm: false,
                 wasm: {
@@ -70,14 +85,12 @@ export function IfcTest() {
             finder.create("DOOR", [{ categories: [/DOOR/ ] }]);
             finder.create("WINDOW", [{ categories: [/WINDOW/] }]);
             finder.create("SLAB", [{ categories: [/SLAB/] }]);
-
-
-
+            finder.create("FURNISHING", [{ categories: [/FURNISHING/] }]);
+            finder.create("ROOF", [{ categories: [/ROOF/] }]);
 
             // add BUI
             // if (!BUI.Manager.initialized) BUI.Manager.init();
             if (!isInitializedRef.current) {
-                // debugger
                 BUI.Manager.init();
                 isInitializedRef.current = true;
             }
@@ -127,7 +140,7 @@ export function IfcTest() {
                     const hider = components.get(OBC.Hider);
                     const onClick = async ({ target }: { target: BUI.Button }) => {
                         target.loading = true;
-                        const modelIdMap = await getResult(Name, finder);
+                        const modelIdMap = await getFinderFilterResult(Name, finder);
                         await hider.isolate(modelIdMap);
                         target.loading = false;
                     };
@@ -169,72 +182,47 @@ export function IfcTest() {
             // document.body.append(panel);
             
             
-            const color = new THREE.Color("purple");
             
-            let attributes: FRAGS.ItemData | undefined;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const onSelectCallback = async (modelIdMap: { [x: number]: Set<any> }, attrs?: FRAGS.ItemData) => {
-                const modelId = Object.keys(modelIdMap)[0];
-                if (modelId && fragments.list.get(modelId)) {
-                    const model = fragments.list.get(modelId)!;
-                    const [data] = await model.getItemsData([...modelIdMap[modelId]]);
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    attrs = data;
-                }
+            // const onSelectCallback = async (modelIdMap: { [x: number]: Set<any> }, attrs?: FRAGS.ItemData) => {
+            //     const modelId = Object.keys(modelIdMap)[0];
+            //     if (modelId && fragments.list.get(modelId)) {
+            //         const model = fragments.list.get(modelId)!;
+            //         const [data] = await model.getItemsData([...modelIdMap[modelId]]);
+            //         // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            //         attrs = data;
+            //     }
 
-                await fragments.highlight(
-                    {
-                    color,
-                    renderedFaces: FRAGS.RenderedFaces.ONE,
-                    opacity: 1,
-                    transparent: false,
-                    },
-                    modelIdMap,
-                );
+            //     await fragments.highlight(
+            //         {
+            //         color: COLOR_PURPLE,
+            //         renderedFaces: FRAGS.RenderedFaces.ONE,
+            //         opacity: 1,
+            //         transparent: false,
+            //         },
+            //         modelIdMap,
+            //     );
 
-                await fragments.core.update(true);
+            //     await fragments.core.update(true);
 
-                // onItemSelected();
-            };
-            (containerRef.current as HTMLElement)?.addEventListener("dblclick", async () => {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const result = (await caster.castRay()) as any;
-                if (!result) return;
-                // The modelIdMap is how selections are represented in the engine.
-                // The keys are modelIds, while the values are sets of localIds (items within the model)
-                const modelIdMap = { [result.fragments.modelId]: new Set([result.localId]) };
-                onSelectCallback(modelIdMap, attributes);
-            });
-            document.getElementById('test')?.addEventListener('click', async () => {
-                // select the element by the viewpoint with the guid 18YHwga450Mw4Fy6M5t_8v
-                // const modelIdMap = await fragments.guidsToModelIdMap(['18YHwga450Mw4Fy6M5t_8v'])
-                const modelIdMap = await fragments.guidsToModelIdMap(['2UD3D7uxP8kecbbBCRtz3R' , '2UD3D7uxP8kecbbBCRtzBk', 
-                    '18YHwga450Mw4Fy6M5t_8r'
-                ])
-                await fragments.highlight({
-                    color: color,
-                    renderedFaces: RenderedFaces.ONE,
-                    opacity: 0.5,
-                    transparent: false
-                }, modelIdMap);
-                await fragments.core.update(true);
-                // const viewpoint = components.get(OBC.Viewpoints);
-                // viewpoint.
-            });
-
-            return {components, world, panel};
-
+            //     // onItemSelected();
+            // };
+            // (containerRef.current as HTMLElement)?.addEventListener("dblclick", async () => {
+            //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            //     const result = (await caster.castRay()) as any;
+            //     if (!result) return;
+            //     // The modelIdMap is how selections are represented in the engine.
+            //     // The keys are modelIds, while the values are sets of localIds (items within the model)
+            //     const modelIdMap = { [result.fragments.modelId]: new Set([result.localId]) };
+            //     onSelectCallback(modelIdMap, attributes);
+            // });
         }
-        const items = init();
+        init();
         return () => {
-            items.then((objs) => {
-                objs?.components?.dispose();
-                // objs?.world?.dispose();
-                objs?.panel?.remove();
-                if (objs?.panel?.parentElement) {
-                    document.body.removeChild(objs?.panel.parentElement);
-                }
-            });
+            componentsRef.current?.dispose();
+            worldRef.current?.dispose();
+            fragmentsRef.current?.dispose();
+            casterRef.current?.dispose();
+            ifcLoaderRef.current?.dispose();
         }
 
 
@@ -257,29 +245,22 @@ export function IfcTest() {
                 "
             />
             <button
-            id='test'>test viewpoint</button>
-            <div ref={containerRef} className='relative h-[70dvh]'/>
+            id='test' onClick={async () => {
+                const modelIdMap = await fragmentsRef.current?.guidsToModelIdMap(['2UD3D7uxP8kecbbBCRtz3R' , '2UD3D7uxP8kecbbBCRtzBk', 
+                    '18YHwga450Mw4Fy6M5t_8r'
+                ])
+                await fragmentsRef.current?.highlight({
+                    color: new THREE.Color("purple"),
+                    renderedFaces: RenderedFaces.ONE,
+                    opacity: 0.5,
+                    transparent: false
+                }, modelIdMap);
+                await fragmentsRef.current?.core.update(true);
+            }}>test viewpoint</button>
+            <div ref={containerRef} className='relative h-[70dvh]' onDoubleClick={async () => {
+                
+            }}/>
         </div>
     );
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
-export async function loadIFCFile(file: File, ifcLoader: OBC.IfcLoader, name: string = "IFCModel") {
-    // const file = await fetch(path);
-    // const data = await file.arrayBuffer();
-    const data = await file.arrayBuffer();
-    const buffer = new Uint8Array(data);
-    await ifcLoader.load(buffer, false, name, {
-        processData: {
-            progressCallback: (progress) => console.log(progress),
-        },
-    });
-}
-
-// eslint-disable-next-line react-refresh/only-export-components
-export async function getResult(name: string, finder: OBC.ItemsFinder) {
-    const finderQuery = finder.list.get(name);
-    if (!finderQuery) return {};
-    const result = await finderQuery.test();
-    return result;
-};
