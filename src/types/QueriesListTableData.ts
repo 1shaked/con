@@ -1,4 +1,4 @@
-export type QueriesListTableData = {
+export type TQueriesListTableData = {
     Name: string;
     Actions: string;
 };
