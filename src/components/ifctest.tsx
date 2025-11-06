@@ -90,14 +90,10 @@ export function IfcTest() {
             finder.create("FURNISHING", [{ categories: [/FURNISHING/] }]);
             finder.create("ROOF", [{ categories: [/ROOF/] }]);
 
-            // add BUI
-            // if (!BUI.Manager.initialized) BUI.Manager.init();
             if (!isInitializedRef.current) {
                 BUI.Manager.init();
                 isInitializedRef.current = true;
             }
-
-            
 
             const queriesList =
                 BUI.Component.create<BUI.Table<TQueriesListTableData>>(() => queriesListTemplate(finder));
@@ -180,15 +176,7 @@ export function IfcTest() {
 
             //     // onItemSelected();
             // };
-            // (containerRef.current as HTMLElement)?.addEventListener("dblclick", async () => {
-            //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            //     const result = (await caster.castRay()) as any;
-            //     if (!result) return;
-            //     // The modelIdMap is how selections are represented in the engine.
-            //     // The keys are modelIds, while the values are sets of localIds (items within the model)
-            //     const modelIdMap = { [result.fragments.modelId]: new Set([result.localId]) };
-            //     onSelectCallback(modelIdMap, attributes);
-            // });
+
         }
         init();
         return () => {
