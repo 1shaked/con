@@ -49,7 +49,7 @@ export function IfcTest() {
                 OBC.SimpleRenderer
             >();
             world.scene = new OBC.SimpleScene(components);
-            
+
             if (!containerRef?.current) return;
             world.scene.setup();
             world.scene.three.background = null;
@@ -63,12 +63,12 @@ export function IfcTest() {
             castersRef.current = casters;
             components.init();
             const caster = casters.get(world);
-            casterRef.current = caster 
-            
+            casterRef.current = caster
+
             const fragments = components.get(OBC.FragmentsManager);
             fragmentsRef.current = fragments;
             fragments.init("/src/worker.mjs");
-            
+
             // set fragment that when a model is added, it is added to the scene and linked to the camera
             fragments.list.onItemSet.add(({ value: model }) => {
                 model.useCamera(world.camera.three);
@@ -99,7 +99,7 @@ export function IfcTest() {
 
             const finder = components.get(OBC.ItemsFinder);
             finder.create("WALL", [{ categories: [/WALL/] }]);
-            finder.create("DOOR", [{ categories: [/DOOR/ ] }]);
+            finder.create("DOOR", [{ categories: [/DOOR/] }]);
             finder.create("WINDOW", [{ categories: [/WINDOW/] }]);
             finder.create("SLAB", [{ categories: [/SLAB/] }]);
             finder.create("FURNISHING", [{ categories: [/FURNISHING/] }]);
@@ -165,9 +165,9 @@ export function IfcTest() {
             panel.classList.add("options-menu");
             (containerRef.current as HTMLElement).append(panel);
             // document.body.append(panel);
-            
-            
-            
+
+
+
             // const onSelectCallback = async (modelIdMap: { [x: number]: Set<any> }, attrs?: FRAGS.ItemData) => {
             //     const modelId = Object.keys(modelIdMap)[0];
             //     if (modelId && fragments.list.get(modelId)) {
@@ -222,22 +222,22 @@ export function IfcTest() {
                 "
             />
             <button
-            id='test' onClick={async () => {
-                const modelIdMap = await fragmentsRef.current?.guidsToModelIdMap(['2UD3D7uxP8kecbbBCRtz3R' , '2UD3D7uxP8kecbbBCRtzBk', 
-                    '18YHwga450Mw4Fy6M5t_8r'
-                ])
-                await fragmentsRef.current?.highlight({
-                    color: new THREE.Color("purple"),
-                    renderedFaces: RenderedFaces.ONE,
-                    opacity: 0.5,
-                    transparent: false
-                }, modelIdMap);
-                await fragmentsRef.current?.core.update(true);
-            }}>test viewpoint</button>
+                id='test' onClick={async () => {
+                    const modelIdMap = await fragmentsRef.current?.guidsToModelIdMap(['2UD3D7uxP8kecbbBCRtz3R', '2UD3D7uxP8kecbbBCRtzBk',
+                        '18YHwga450Mw4Fy6M5t_8r'
+                    ])
+                    await fragmentsRef.current?.highlight({
+                        color: new THREE.Color("purple"),
+                        renderedFaces: RenderedFaces.ONE,
+                        opacity: 0.5,
+                        transparent: false
+                    }, modelIdMap);
+                    await fragmentsRef.current?.core.update(true);
+                }}>test viewpoint</button>
             <div ref={containerRef} className='relative h-[70dvh] rounded-lg border border-gray-200 shadow-lg overflow-hidden' onDoubleClick={async () => {
-                
-            }}/>
-            
+
+            }} />
+
             {/* Enhanced Data Display */}
             <div className="mt-6 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
                 <div className="bg-linear-to-r from-blue-600 to-blue-700 px-6 py-4">
@@ -251,7 +251,7 @@ export function IfcTest() {
                         {model_data.data?.data.length || 0} element types found
                     </p>
                 </div>
-                
+
                 <div className="p-6">
                     {model_data.isLoading ? (
                         <div className="flex items-center justify-center py-12">
@@ -265,8 +265,8 @@ export function IfcTest() {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {model_data.data?.data.map((row, ) => (
-                                <div 
+                            {model_data.data?.data.map((row,) => (
+                                <div
                                     key={`${row.Element_Type}-${row.Level}`}
                                     className="group bg-linear-to-br from-gray-50 to-gray-100 hover:from-blue-50 hover:to-blue-100 
                                              border border-gray-200 hover:border-blue-300 rounded-lg p-4 
@@ -296,15 +296,15 @@ export function IfcTest() {
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div className="flex items-center justify-between pt-3 border-t border-gray-200 
                                                   group-hover:border-blue-200">
                                         <div className="flex items-center text-sm text-gray-600 group-hover:text-blue-600">
                                             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                                                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
-                                            Total Quantity {row.Quantity.toLocaleString()}
+                                            Total Quantity {row.Project_Total.toLocaleString()}
                                         </div>
                                         <button className="opacity-0 group-hover:opacity-100 transition-opacity 
                                                          text-blue-600 hover:text-blue-700 text-sm font-medium">
@@ -315,7 +315,7 @@ export function IfcTest() {
                             ))}
                         </div>
                     )}
-                    
+
                     {model_data.data?.data.length === 0 && !model_data.isLoading && (
                         <div className="text-center py-12">
                             <div className="text-gray-400 text-6xl mb-4">📋</div>
