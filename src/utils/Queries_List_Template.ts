@@ -23,6 +23,6 @@ export function queriesListTemplate(finder: ItemsFinder) {
     };
 
     return BUIHtml`
-                    <bim-table ${BUIRef(onCreated)}></bim-table>
-                `;
+        <bim-table ${BUIRef(onCreated)}></bim-table>
+    `;
 };
