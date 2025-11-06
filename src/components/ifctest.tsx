@@ -4,6 +4,7 @@ import * as FRAGS from "@thatopen/fragments";
 // import * as THREE from "three";
 import * as BUI from "@thatopen/ui";
 import * as THREE from "three";
+import { RenderedFaces } from '@thatopen/fragments';
 
 export function IfcTest() {
     const containerRef = useRef(null);
@@ -206,6 +207,17 @@ export function IfcTest() {
             });
             document.getElementById('test')?.addEventListener('click', async () => {
                 // select the element by the viewpoint with the guid 18YHwga450Mw4Fy6M5t_8v
+                // const modelIdMap = await fragments.guidsToModelIdMap(['18YHwga450Mw4Fy6M5t_8v'])
+                const modelIdMap = await fragments.guidsToModelIdMap(['2UD3D7uxP8kecbbBCRtz3R' , '2UD3D7uxP8kecbbBCRtzBk', 
+                    '18YHwga450Mw4Fy6M5t_8r'
+                ])
+                await fragments.highlight({
+                    color: color,
+                    renderedFaces: RenderedFaces.ONE,
+                    opacity: 0.5,
+                    transparent: false
+                }, modelIdMap);
+                await fragments.core.update(true);
                 // const viewpoint = components.get(OBC.Viewpoints);
                 // viewpoint.
             });
