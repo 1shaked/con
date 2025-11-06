@@ -1,8 +1,9 @@
 import { useRef, useEffect } from 'react';
 import * as OBC from "@thatopen/components";
-// import * as FRAGS from "@thatopen/fragments";
+import * as FRAGS from "@thatopen/fragments";
 // import * as THREE from "three";
 import * as BUI from "@thatopen/ui";
+import * as THREE from "three";
 
 export function IfcTest() {
     const containerRef = useRef(null);
@@ -29,7 +30,9 @@ export function IfcTest() {
             // Setup Grid
             const grids = components.get(OBC.Grids);
             grids.create(world);
+            const casters = components.get(OBC.Raycasters);
             components.init();
+            const caster = casters.get(world);
             
             const fragments = components.get(OBC.FragmentsManager);
             fragments.init("/src/worker.mjs");
@@ -164,6 +167,49 @@ export function IfcTest() {
             (containerRef.current as HTMLElement).append(panel);
             // document.body.append(panel);
             
+            
+            const color = new THREE.Color("purple");
+            
+            let attributes: FRAGS.ItemData | undefined;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const onSelectCallback = async (modelIdMap: { [x: number]: Set<any> }, attrs?: FRAGS.ItemData) => {
+                const modelId = Object.keys(modelIdMap)[0];
+                if (modelId && fragments.list.get(modelId)) {
+                    const model = fragments.list.get(modelId)!;
+                    const [data] = await model.getItemsData([...modelIdMap[modelId]]);
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    attrs = data;
+                }
+
+                await fragments.highlight(
+                    {
+                    color,
+                    renderedFaces: FRAGS.RenderedFaces.ONE,
+                    opacity: 1,
+                    transparent: false,
+                    },
+                    modelIdMap,
+                );
+
+                await fragments.core.update(true);
+
+                // onItemSelected();
+            };
+            (containerRef.current as HTMLElement)?.addEventListener("dblclick", async () => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const result = (await caster.castRay()) as any;
+                if (!result) return;
+                // The modelIdMap is how selections are represented in the engine.
+                // The keys are modelIds, while the values are sets of localIds (items within the model)
+                const modelIdMap = { [result.fragments.modelId]: new Set([result.localId]) };
+                onSelectCallback(modelIdMap, attributes);
+            });
+            document.getElementById('test')?.addEventListener('click', async () => {
+                // select the element by the viewpoint with the guid 18YHwga450Mw4Fy6M5t_8v
+                // const viewpoint = components.get(OBC.Viewpoints);
+                // viewpoint.
+            });
+
             return {components, world, panel};
 
         }
@@ -198,6 +244,8 @@ export function IfcTest() {
                     disabled:opacity-50
                 "
             />
+            <button
+            id='test'>test viewpoint</button>
             <div ref={containerRef} className='relative h-[70dvh]'/>
         </div>
     );
