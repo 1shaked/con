@@ -9,6 +9,8 @@ import { loadIFCFile } from '../utils/Load_IFC_File';
 import { getFinderFilterResult } from '../utils/Get_Finder_Filter_Result';
 import type { TQueriesListTableData } from '../types/QueriesListTableData';
 import { queriesListTemplate } from '../utils/Queries_List_Template';
+import { useQuery } from '@tanstack/react-query';
+import { URL_SERVER } from '../consts';
 
 
 export function IfcTest() {
@@ -20,6 +22,14 @@ export function IfcTest() {
     const castersRef = useRef<OBC.Raycasters | null>(null);
     const ifcLoaderRef = useRef<OBC.IfcLoader | null>(null);
     const casterRef = useRef<OBC.SimpleRaycaster | null>(null);
+    const model_data = useQuery({
+        queryKey: ['model_data'],
+        queryFn: async () => {
+            const res = await fetch(`${URL_SERVER}model_data`);
+            const data = await res.json();
+            return data;
+        }
+    })
     useEffect(() => {
         async function init() {
             const components = new OBC.Components();
@@ -220,6 +230,10 @@ export function IfcTest() {
             <div ref={containerRef} className='relative h-[70dvh]' onDoubleClick={async () => {
                 
             }}/>
+            <pre>
+                
+                {JSON.stringify(model_data.data, null, 2)}
+            </pre>
         </div>
     );
 }
