@@ -31,8 +31,6 @@ export function IfcTest() {
                 OBC.OrthoPerspectiveCamera,
                 OBC.SimpleRenderer
             >();
-
-
             world.scene = new OBC.SimpleScene(components);
             
             if (!containerRef?.current) return;
