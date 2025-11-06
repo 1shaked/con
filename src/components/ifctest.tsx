@@ -11,6 +11,7 @@ import type { TQueriesListTableData } from '../types/QueriesListTableData';
 import { queriesListTemplate } from '../utils/Queries_List_Template';
 import { useQuery } from '@tanstack/react-query';
 import { URL_SERVER } from '../consts';
+import { Server_File_Info_Schema } from '../validators/Server_File_Info_Schema';
 
 
 export function IfcTest() {
@@ -25,9 +26,15 @@ export function IfcTest() {
     const model_data = useQuery({
         queryKey: ['model_data'],
         queryFn: async () => {
-            const res = await fetch(`${URL_SERVER}model_data`);
+            const res = await fetch(`${URL_SERVER}file/base_structure.ifc`);
             const data = await res.json();
-            return data;
+            // validate the data
+            const result = Server_File_Info_Schema.safeParse(data);
+            if (!result.success) {
+                console.error("Invalid data:", result.error);
+                throw new Error("Invalid data");
+            }
+            return result.data;
         }
     })
     useEffect(() => {
@@ -230,10 +237,10 @@ export function IfcTest() {
             <div ref={containerRef} className='relative h-[70dvh]' onDoubleClick={async () => {
                 
             }}/>
-            <pre>
-                
-                {JSON.stringify(model_data.data, null, 2)}
-            </pre>
+            {model_data.data?.data.map((row) => <div key={`${row.Element_Type}-${row.Level}`}
+            className=''>
+                <p>{row.Element_Type} - {row.Quantity} {row.Level}</p>
+            </div>)}
         </div>
     );
 }
