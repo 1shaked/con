@@ -261,43 +261,7 @@ export function IfcTest() {
                     disabled:opacity-50
                 "
             />
-            <button
-                id='test' onClick={async () => {
-                    // selectElement()
-                    // const form = new FormData();
-                    // form.append("element_type", "M_Concrete-Rectangular Beam:400 x 800mm");
-                    // form.append("level_name", "03 - Floor");
-                    // form.append("ifc_file", file as Blob);
-                    // const res = await fetch(`${URL_SERVER}get_guids/`, {
-                    //     method: 'POST',
-                    //     body: form
-                    // });
-                    // const data = await res.json();
-                    // const validateData = Server_GUIDS_For_Type_Schema.safeParse(data);
-                    // if (!validateData.success) {
-                    //     console.error("Invalid data:", validateData.error);
-                    //     return;
-                    // }
-                    // console.log("Validated GUIDs Data:", validateData.data);
-                    // const modelIdMap = await fragmentsRef.current?.guidsToModelIdMap(validateData.data.guids)
-                    // await fragmentsRef.current?.highlight({
-                    //     color: new THREE.Color("purple"),
-                    //     renderedFaces: RenderedFaces.ONE,
-                    //     opacity: 0.5,
-                    //     transparent: false
-                    // }, modelIdMap);
-                    // await fragmentsRef.current?.core.update(true);
-                    // const modelIdMap = await fragmentsRef.current?.guidsToModelIdMap(['2UD3D7uxP8kecbbBCRtz3R', '2UD3D7uxP8kecbbBCRtzBk',
-                    //     '18YHwga450Mw4Fy6M5t_8r'
-                    // ])
-                    // await fragmentsRef.current?.highlight({
-                    //     color: new THREE.Color("purple"),
-                    //     renderedFaces: RenderedFaces.ONE,
-                    //     opacity: 0.5,
-                    //     transparent: false
-                    // }, modelIdMap);
-                    // await fragmentsRef.current?.core.update(true);
-                }}>test viewpoint</button>
+            
             <div ref={containerRef} className='relative h-[70dvh] rounded-lg border border-gray-200 shadow-lg overflow-hidden' onDoubleClick={async () => {
 
             }} />
