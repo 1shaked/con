@@ -12,6 +12,7 @@
   "dependencies": {
     "@tanstack/react-query": "^4.42.0",
     "@thatopen/components": "^3.2.2",
+    "@thatopen/components-front": "^3.2.1",
     "@thatopen/fragments": "^3.2.0",
     "@thatopen/ui": "^3.2.0",
     "react": "^19.1.1",
