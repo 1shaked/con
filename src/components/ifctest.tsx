@@ -102,7 +102,7 @@ export function IfcTest() {
                 form.append("ifc_file", file);
                 await fetch(`${URL_SERVER}upload_ifc/`, {
                     method: 'POST',
-                    body: form  
+                    body: form
                 });
                 // target_type_name = "M_Concrete-Rectangular Beam:400 x 800mm"
                 // target_level_name = "03 - Floor"  # or “Level 03” / “03 – Floor” depending on how the IFC storey is named
@@ -221,7 +221,30 @@ export function IfcTest() {
 
 
     }, []);
-
+    async function selectElement(element_type: string , level_name: string, ifc_file: Blob) {
+        const form = new FormData();
+        form.append("element_type", element_type);
+        form.append("level_name", level_name);
+        form.append("ifc_file", ifc_file);
+        const res = await fetch(`${URL_SERVER}get_guids/`, {
+            method: 'POST',
+            body: form
+        });
+        const data = await res.json();
+        const validateData = Server_GUIDS_For_Type_Schema.safeParse(data);
+        if (!validateData.success) {
+            console.error("Invalid data:", validateData.error);
+            return;
+        }
+        console.log("Validated GUIDs Data:", validateData.data);
+        const modelIdMap = await fragmentsRef.current?.guidsToModelIdMap(validateData.data.guids)
+        await fragmentsRef.current?.highlight({
+            color: new THREE.Color("purple"),
+            renderedFaces: RenderedFaces.ONE,
+            opacity: 0.5,
+            transparent: false
+        }, modelIdMap);
+    }
     return (
         <div className="">
             <input
@@ -240,29 +263,30 @@ export function IfcTest() {
             />
             <button
                 id='test' onClick={async () => {
-                    const form = new FormData();
-                    form.append("element_type", "M_Concrete-Rectangular Beam:400 x 800mm");
-                    form.append("level_name", "03 - Floor");
-                    form.append("ifc_file", file as Blob);
-                    const res = await fetch(`${URL_SERVER}get_guids/`, {
-                        method: 'POST',
-                        body: form
-                    });
-                    const data = await res.json();
-                    const validateData = Server_GUIDS_For_Type_Schema.safeParse(data);
-                    if (!validateData.success) {
-                        console.error("Invalid data:", validateData.error);
-                        return;
-                    }
-                    console.log("Validated GUIDs Data:", validateData.data);
-                    const modelIdMap = await fragmentsRef.current?.guidsToModelIdMap(validateData.data.guids)
-                    await fragmentsRef.current?.highlight({
-                        color: new THREE.Color("purple"),
-                        renderedFaces: RenderedFaces.ONE,
-                        opacity: 0.5,
-                        transparent: false
-                    }, modelIdMap);
-                    await fragmentsRef.current?.core.update(true);
+                    // selectElement()
+                    // const form = new FormData();
+                    // form.append("element_type", "M_Concrete-Rectangular Beam:400 x 800mm");
+                    // form.append("level_name", "03 - Floor");
+                    // form.append("ifc_file", file as Blob);
+                    // const res = await fetch(`${URL_SERVER}get_guids/`, {
+                    //     method: 'POST',
+                    //     body: form
+                    // });
+                    // const data = await res.json();
+                    // const validateData = Server_GUIDS_For_Type_Schema.safeParse(data);
+                    // if (!validateData.success) {
+                    //     console.error("Invalid data:", validateData.error);
+                    //     return;
+                    // }
+                    // console.log("Validated GUIDs Data:", validateData.data);
+                    // const modelIdMap = await fragmentsRef.current?.guidsToModelIdMap(validateData.data.guids)
+                    // await fragmentsRef.current?.highlight({
+                    //     color: new THREE.Color("purple"),
+                    //     renderedFaces: RenderedFaces.ONE,
+                    //     opacity: 0.5,
+                    //     transparent: false
+                    // }, modelIdMap);
+                    // await fragmentsRef.current?.core.update(true);
                     // const modelIdMap = await fragmentsRef.current?.guidsToModelIdMap(['2UD3D7uxP8kecbbBCRtz3R', '2UD3D7uxP8kecbbBCRtzBk',
                     //     '18YHwga450Mw4Fy6M5t_8r'
                     // ])
@@ -316,7 +340,8 @@ export function IfcTest() {
                                     <div className="flex items-start justify-between mb-3">
                                         <div className="flex-1">
                                             <h4 className="font-semibold text-gray-900 group-hover:text-blue-700 
-                                                         text-lg leading-tight">
+                                                         text-lg leading-tight"
+                                                         onClick={() => selectElement(row.Element_Type, row.Level ?? '', file as Blob)}>
                                                 {row.Element_Type}
                                             </h4>
                                             <div className="flex items-center gap-2 mt-2">
