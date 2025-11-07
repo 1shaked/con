@@ -217,7 +217,7 @@ export function IfcTest() {
 
 
     }, []);
-    async function selectElement(element_type: string , level_name: string, ifc_file: Blob) {
+    async function selectElement(element_type: string , level_name: string, ifc_file: Blob, to_remove: boolean = false) {
         const form = new FormData();
         form.append("element_type", element_type);
         form.append("level_name", level_name);
@@ -234,6 +234,11 @@ export function IfcTest() {
         }
         console.log("Validated GUIDs Data:", validateData.data);
         const modelIdMap = await fragmentsRef.current?.guidsToModelIdMap(validateData.data.guids)
+        if (!modelIdMap) return ;
+        if (to_remove) {
+            await fragmentsRef.current?.resetHighlight(modelIdMap);
+            return ;
+        }
         await fragmentsRef.current?.highlight({
             color: new THREE.Color("purple"),
             renderedFaces: RenderedFaces.ONE,
@@ -241,6 +246,7 @@ export function IfcTest() {
             transparent: false
         }, modelIdMap);
     }
+    
     return (
         <div className="">
             <input
@@ -290,33 +296,44 @@ export function IfcTest() {
                             {model_data.data?.data.map((row,) => (
                                 <div
                                     key={`${row.Element_Type}-${row.Level}`}
-                                    className={`group bg-linear-to-br from-gray-50 to-gray-100 hover:from-blue-50 hover:to-blue-100 
+                                    className={`group bg-linear-to-br from-gray-50 to-gray-100
                                              border border-gray-200 hover:border-blue-300 rounded-lg p-4 
                                              transform hover:scale-105 transition-all duration-200 
                                              hover:shadow-md cursor-pointer
-                                             ${selectedElements.has(`${row.Element_Type}-${row.Level}`) ? 'border-blue-300 bg-blue-600 border-2' : ''}`}
+                                             ${selectedElements.has(`${row.Element_Type}-${row.Level}`) ? 'shadow-lg shadow-blue-500/25 border-blue-400 bg-linear-to-br from-green-500 to-green-50' : ''}`}
                                 >
                                     <div className="flex items-start justify-between mb-3">
                                         <div className="flex-1">
                                             <h4 className={`font-semibold text-gray-900 group-hover:text-blue-700 
-                                                         text-lg leading-tight `}
+                                                         text-lg leading-tight ${selectedElements.has(`${row.Element_Type}-${row.Level}`) ? 'text-blue-700' : ''}`}
                                                          onClick={() => {
-                                                            setSelectedElements(new Set([...selectedElements, `${row.Element_Type}-${row.Level}`]));
-                                                            selectElement(row.Element_Type, row.Level ?? '', file as Blob)}
+                                                            const key = `${row.Element_Type}-${row.Level}`;
+                                                            if (selectedElements.has(key)) {
+                                                                selectedElements.delete(key);
+                                                                setSelectedElements(new Set([...selectedElements]));
+                                                                selectElement(row.Element_Type, row.Level ?? '', file as Blob, true)
+
+                                                            } else {
+                                                                setSelectedElements(new Set([...selectedElements, key]));
+                                                                selectElement(row.Element_Type, row.Level ?? '', file as Blob)
+                                                            }
+                                                        }
                                                             
                                                         }>
                                                 {row.Element_Type}
                                             </h4>
                                             <div className="flex items-center gap-2 mt-2">
-                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full 
-                                                               text-xs font-medium bg-blue-100 text-blue-800 
-                                                               group-hover:bg-blue-200">
+                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full 
+                                                               text-xs font-medium 
+                                                               ${selectedElements.has(`${row.Element_Type}-${row.Level}`) ? 'bg-blue-200 text-blue-900' : 'bg-blue-100 text-blue-800'} 
+                                                               group-hover:bg-blue-200`}>
                                                     Level {row.Level}
                                                 </span>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <div className="text-2xl font-bold text-blue-600 group-hover:text-blue-700">
+                                            <div className={`text-2xl font-bold group-hover:text-blue-700 
+                                                           ${selectedElements.has(`${row.Element_Type}-${row.Level}`) ? 'text-blue-700' : 'text-blue-600'}`}>
                                                 {row.Quantity.toLocaleString()}
                                             </div>
                                             <div className="text-xs text-gray-500 uppercase tracking-wide">
@@ -327,7 +344,8 @@ export function IfcTest() {
 
                                     <div className="flex items-center justify-between pt-3 border-t border-gray-200 
                                                   group-hover:border-blue-200">
-                                        <div className="flex items-center text-sm text-gray-600 group-hover:text-blue-600">
+                                        <div className={`flex items-center text-sm group-hover:text-blue-600 
+                                                       ${selectedElements.has(`${row.Element_Type}-${row.Level}`) ? 'text-blue-600' : 'text-gray-600'}`}>
                                             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                                                     d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
