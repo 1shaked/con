@@ -39,6 +39,7 @@ export function IfcTest() {
             return result.data;
         }
     })
+    const [selectedElements, setSelectedElements] = useState<Set<string>>(new Set());
     useEffect(() => {
         async function init() {
             const components = new OBC.Components();
@@ -262,9 +263,7 @@ export function IfcTest() {
                 "
             />
             
-            <div ref={containerRef} className='relative h-[70dvh] rounded-lg border border-gray-200 shadow-lg overflow-hidden' onDoubleClick={async () => {
-
-            }} />
+            <div ref={containerRef} className='relative h-[70dvh] rounded-lg border border-gray-200 shadow-lg overflow-hidden' />
 
             {/* Enhanced Data Display */}
             <div className="mt-6 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
@@ -303,9 +302,13 @@ export function IfcTest() {
                                 >
                                     <div className="flex items-start justify-between mb-3">
                                         <div className="flex-1">
-                                            <h4 className="font-semibold text-gray-900 group-hover:text-blue-700 
-                                                         text-lg leading-tight"
-                                                         onClick={() => selectElement(row.Element_Type, row.Level ?? '', file as Blob)}>
+                                            <h4 className={`font-semibold text-gray-900 group-hover:text-blue-700 
+                                                         text-lg leading-tight ${selectedElements.has(`${row.Element_Type}-${row.Level}`) ? 'underline decoration-blue-500 underline-offset-4' : ''}`}
+                                                         onClick={() => {
+                                                            setSelectedElements(new Set([...selectedElements, `${row.Element_Type}-${row.Level}`]));
+                                                            selectElement(row.Element_Type, row.Level ?? '', file as Blob)}
+                                                            
+                                                        }>
                                                 {row.Element_Type}
                                             </h4>
                                             <div className="flex items-center gap-2 mt-2">
