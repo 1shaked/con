@@ -25,10 +25,13 @@ export function IfcTest() {
     const ifcLoaderRef = useRef<OBC.IfcLoader | null>(null);
     const casterRef = useRef<OBC.SimpleRaycaster | null>(null);
     const [file, setFile] = useState<File | null>(null);
+    // get the file name
+    const fileName = file ? file.name : null;
     const model_data = useQuery({
-        queryKey: ['model_data'],
+        queryKey: ['model_data', fileName],
         queryFn: async () => {
-            const res = await fetch(`${URL_SERVER}file/base_structure.ifc`);
+            if (!fileName) return { file: '', data: [] };
+            const res = await fetch(`${URL_SERVER}file/${fileName}`);
             const data = await res.json();
             // validate the data
             const result = Server_File_Info_Schema.safeParse(data);
@@ -104,15 +107,7 @@ export function IfcTest() {
                 await fetch(`${URL_SERVER}upload_ifc/`, {
                     method: 'POST',
                     body: form
-                });
-                // target_type_name = "M_Concrete-Rectangular Beam:400 x 800mm"
-                // target_level_name = "03 - Floor"  # or “Level 03” / “03 – Floor” depending on how the IFC storey is named
-                form.append("element_type", "M_Concrete-Rectangular Beam:400 x 800mm");
-                form.append("level_name", "03 - Floor");
-                await fetch(`${URL_SERVER}get_guids/`, {
-                    method: 'POST',
-                    body: form
-                });
+                })
             });
 
             const finder = components.get(OBC.ItemsFinder);
@@ -295,15 +290,16 @@ export function IfcTest() {
                             {model_data.data?.data.map((row,) => (
                                 <div
                                     key={`${row.Element_Type}-${row.Level}`}
-                                    className="group bg-linear-to-br from-gray-50 to-gray-100 hover:from-blue-50 hover:to-blue-100 
+                                    className={`group bg-linear-to-br from-gray-50 to-gray-100 hover:from-blue-50 hover:to-blue-100 
                                              border border-gray-200 hover:border-blue-300 rounded-lg p-4 
                                              transform hover:scale-105 transition-all duration-200 
-                                             hover:shadow-md cursor-pointer"
+                                             hover:shadow-md cursor-pointer
+                                             ${selectedElements.has(`${row.Element_Type}-${row.Level}`) ? 'border-blue-300 bg-blue-600 border-2' : ''}`}
                                 >
                                     <div className="flex items-start justify-between mb-3">
                                         <div className="flex-1">
                                             <h4 className={`font-semibold text-gray-900 group-hover:text-blue-700 
-                                                         text-lg leading-tight ${selectedElements.has(`${row.Element_Type}-${row.Level}`) ? 'underline decoration-blue-500 underline-offset-4' : ''}`}
+                                                         text-lg leading-tight `}
                                                          onClick={() => {
                                                             setSelectedElements(new Set([...selectedElements, `${row.Element_Type}-${row.Level}`]));
                                                             selectElement(row.Element_Type, row.Level ?? '', file as Blob)}
