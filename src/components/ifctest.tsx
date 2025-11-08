@@ -262,35 +262,6 @@ export function IfcTest() {
             }, modelIdMap);
         }
     })
-    // async function selectElement(element_type: string, level_name: string, ifc_file: Blob, to_remove: boolean = false) {
-    //     const form = new FormData();
-    //     form.append("element_type", element_type);
-    //     form.append("level_name", level_name);
-    //     form.append("ifc_file", ifc_file);
-    //     const res = await fetch(`${URL_SERVER}get_guids/`, {
-    //         method: 'POST',
-    //         body: form
-    //     });
-    //     const data = await res.json();
-    //     const validateData = Server_GUIDS_For_Type_Schema.safeParse(data);
-    //     if (!validateData.success) {
-    //         console.error("Invalid data:", validateData.error);
-    //         return;
-    //     }
-    //     console.log("Validated GUIDs Data:", validateData.data);
-    //     const modelIdMap = await fragmentsRef.current?.guidsToModelIdMap(validateData.data.guids)
-    //     if (!modelIdMap) return;
-    //     if (to_remove) {
-    //         await fragmentsRef.current?.resetHighlight(modelIdMap);
-    //         return;
-    //     }
-    //     await fragmentsRef.current?.highlight({
-    //         color: new THREE.Color("purple"),
-    //         renderedFaces: RenderedFaces.ONE,
-    //         opacity: 0.5,
-    //         transparent: false
-    //     }, modelIdMap);
-    // }
 
     return (
         <div className="">
