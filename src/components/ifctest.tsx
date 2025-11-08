@@ -156,16 +156,16 @@ export function IfcTest() {
             //         target.loading = false;
             //     };
 
-                // return BUI.html`
-                //     <bim-panel active label="Items Finder Tutorial" class="options-menu">
-                //     <bim-panel-section style="min-width: 14rem" label="General">
-                //         <bim-button label="Reset Visibility" @click=${onResetVisibility}></bim-button>
-                //     </bim-panel-section>
-                //     <bim-panel-section label="Queries">
-                //         ${queriesList}
-                //     </bim-panel-section>
-                //     </bim-panel>
-                // `;
+            // return BUI.html`
+            //     <bim-panel active label="Items Finder Tutorial" class="options-menu">
+            //     <bim-panel-section style="min-width: 14rem" label="General">
+            //         <bim-button label="Reset Visibility" @click=${onResetVisibility}></bim-button>
+            //     </bim-panel-section>
+            //     <bim-panel-section label="Queries">
+            //         ${queriesList}
+            //     </bim-panel-section>
+            //     </bim-panel>
+            // `;
             // });
             // check if panel already exists in the document
             const existingPanel = document.body.querySelector('.options-menu');
@@ -205,7 +205,7 @@ export function IfcTest() {
 
             //     // onItemSelected();
             // };
-            
+
 
         }
         init();
@@ -229,7 +229,7 @@ export function IfcTest() {
         mutationFn: async (params: ElementSelectionParams) => {
             const key = `${params.element_type}-${params.level_name}`;
             const to_remove = selectedElements.has(key)
-            if (to_remove ) {
+            if (to_remove) {
                 selectedElements.delete(key);
                 setSelectedElements(new Set([...selectedElements]))
             } else {
@@ -266,28 +266,28 @@ export function IfcTest() {
     })
     async function selectedElementIndividuallyMarker() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const result = (await casterRef.current?.castRay()) as any;
-                if (!result) return;
-                const modelId = result.fragments.modelId;
-                const localId = result.localId;
-                const modelIdMap = { [modelId]: new Set([localId]) };
-                const guids = await fragmentsRef.current?.modelIdMapToGuids(modelIdMap);
-                console.log("GUIDs:", guids);
-                if (!guids) return;
-                for (const guid of guids) {
-                    if (selectedElementIndividually.has(guid)) {
-                        setSelectedElementIndividually(new Set([...selectedElementIndividually].filter(id => id !== guid)));
-                        await fragmentsRef.current?.resetHighlight(modelIdMap);
-                        return ;
-                    }
-                    setSelectedElementIndividually(new Set([...selectedElementIndividually, guid]));
-                    await fragmentsRef.current?.highlight({
-                        color: new THREE.Color("red"),
-                        renderedFaces: RenderedFaces.ONE,
-                        opacity: 0.5,
-                        transparent: false,
-                    }, modelIdMap);
-                }
+        const result = (await casterRef.current?.castRay()) as any;
+        if (!result) return;
+        const modelId = result.fragments.modelId;
+        const localId = result.localId;
+        const modelIdMap = { [modelId]: new Set([localId]) };
+        const guids = await fragmentsRef.current?.modelIdMapToGuids(modelIdMap);
+        console.log("GUIDs:", guids);
+        if (!guids) return;
+        for (const guid of guids) {
+            if (selectedElementIndividually.has(guid)) {
+                setSelectedElementIndividually(new Set([...selectedElementIndividually].filter(id => id !== guid)));
+                await fragmentsRef.current?.resetHighlight(modelIdMap);
+                return;
+            }
+            setSelectedElementIndividually(new Set([...selectedElementIndividually, guid]));
+            await fragmentsRef.current?.highlight({
+                color: new THREE.Color("red"),
+                renderedFaces: RenderedFaces.ONE,
+                opacity: 0.5,
+                transparent: false,
+            }, modelIdMap);
+        }
     }
     return (
         <div className="">
@@ -306,9 +306,9 @@ export function IfcTest() {
                 "
             />
 
-            <div ref={containerRef} 
-            className='relative h-[70dvh] rounded-lg border border-gray-200 shadow-lg overflow-hidden'
-            onDoubleClick={selectedElementIndividuallyMarker} />
+            <div ref={containerRef}
+                className='relative h-[70dvh] rounded-lg border border-gray-200 shadow-lg overflow-hidden'
+                onDoubleClick={selectedElementIndividuallyMarker} />
             {/* Enhanced Data Display */}
             <div className="mt-6 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
                 <div className="bg-linear-to-r from-blue-600 to-blue-700 px-6 py-4">
@@ -349,7 +349,7 @@ export function IfcTest() {
                                         <div className="flex-1">
                                             <h4 className={`font-semibold text-gray-900 group-hover:text-blue-700 
                                                          text-lg leading-tight ${selectedElements.has(`${row.Element_Type}-${row.Level}`) ? 'text-blue-700' : ''}`}
-                                                >
+                                            >
                                                 {row.Element_Type}
                                             </h4>
                                             <div className="flex items-center gap-2 mt-2">
@@ -384,14 +384,14 @@ export function IfcTest() {
                                         </div>
                                         <button className="opacity-0 group-hover:opacity-100 
                                                          text-blue-50 hover:text-blue-700 hover:bg-white text-sm font-medium"
-                                                         onClick={() => {
-                                                    element_details_mutation.mutate({
-                                                            element_type: row.Element_Type,
-                                                            level_name: row.Level ?? '',
-                                                            ifc_file: file as Blob,
-                                                    })
-                                                }}>
-                                                    {selectedElements.has(`${row.Element_Type}-${row.Level}`) ? 'Hide Details' : 'View Details'}
+                                            onClick={() => {
+                                                element_details_mutation.mutate({
+                                                    element_type: row.Element_Type,
+                                                    level_name: row.Level ?? '',
+                                                    ifc_file: file as Blob,
+                                                })
+                                            }}>
+                                            {selectedElements.has(`${row.Element_Type}-${row.Level}`) ? 'Hide Details' : 'View Details'}
                                             →
                                         </button>
                                     </div>
