@@ -322,35 +322,7 @@ export function IfcTest() {
                                         <div className="flex-1">
                                             <h4 className={`font-semibold text-gray-900 group-hover:text-blue-700 
                                                          text-lg leading-tight ${selectedElements.has(`${row.Element_Type}-${row.Level}`) ? 'text-blue-700' : ''}`}
-                                                onClick={() => {
-                                                    // const key = `${row.Element_Type}-${row.Level}`;
-                                                    element_details_mutation.mutate({
-                                                            element_type: row.Element_Type,
-                                                            level_name: row.Level ?? '',
-                                                            ifc_file: file as Blob,
-                                                        })
-                                                    // if (selectedElements.has(key)) {
-                                                        // selectedElements.delete(key);
-                                                        // setSelectedElements(new Set([...selectedElements]));
-                                                        // element_details_mutation.mutate({
-                                                        //     element_type: row.Element_Type,
-                                                        //     level_name: row.Level ?? '',
-                                                        //     ifc_file: file as Blob,
-                                                        // })
-                                                        // selectElement(row.Element_Type, row.Level ?? '', file as Blob, true)
-
-                                                    // } else {
-                                                        // setSelectedElements(new Set([...selectedElements, key]));
-                                                    //     selectElement(row.Element_Type, row.Level ?? '', file as Blob)
-                                                    //     element_details_mutation.mutate({
-                                                    //         element_type: row.Element_Type,
-                                                    //         level_name: row.Level ?? '',
-                                                    //         ifc_file: file as Blob,
-                                                    //     })
-                                                    // }
-                                                }
-
-                                                }>
+                                                >
                                                 {row.Element_Type}
                                             </h4>
                                             <div className="flex items-center gap-2 mt-2">
@@ -383,9 +355,17 @@ export function IfcTest() {
                                             </svg>
                                             Total Quantity {row.Project_Total.toLocaleString()}
                                         </div>
-                                        <button className="opacity-0 group-hover:opacity-100 transition-opacity 
-                                                         text-blue-600 hover:text-blue-700 text-sm font-medium">
-                                            View Details →
+                                        <button className="opacity-0 group-hover:opacity-100 
+                                                         text-blue-50 hover:text-blue-700 hover:bg-white text-sm font-medium"
+                                                         onClick={() => {
+                                                    element_details_mutation.mutate({
+                                                            element_type: row.Element_Type,
+                                                            level_name: row.Level ?? '',
+                                                            ifc_file: file as Blob,
+                                                    })
+                                                }}>
+                                                    {selectedElements.has(`${row.Element_Type}-${row.Level}`) ? 'Hide Details' : 'View Details'}
+                                            →
                                         </button>
                                     </div>
                                 </div>
