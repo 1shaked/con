@@ -13,6 +13,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { URL_SERVER } from '../consts';
 import { Server_File_Info_Schema } from '../validators/Server_File_Info_Schema';
 import { Server_GUIDS_For_Type_Schema } from '../validators/Server_GUIDS_For_Type';
+import type { ElementSelectionParams } from '../types/ElementSelectionParams';
 
 
 export function IfcTest() {
@@ -130,11 +131,7 @@ export function IfcTest() {
 
 
     }, []);
-    interface ElementSelectionParams {
-        element_type: string;
-        level_name: string;
-        ifc_file: Blob;
-    }
+    
     const element_details_mutation = useMutation({
         mutationKey: ['element_details'],
         mutationFn: async (params: ElementSelectionParams) => {
