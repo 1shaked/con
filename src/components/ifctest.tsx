@@ -43,6 +43,7 @@ export function IfcTest() {
         }
     })
     const [selectedElements, setSelectedElements] = useState<Set<string>>(new Set());
+    const [selectedElementIndividually, setSelectedElementIndividually] = useState<Set<string>>(new Set());
     useEffect(() => {
         async function init() {
             const components = new OBC.Components();
@@ -263,7 +264,31 @@ export function IfcTest() {
             }, modelIdMap);
         }
     })
-
+    async function selectedElementIndividuallyMarker() {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const result = (await casterRef.current?.castRay()) as any;
+                if (!result) return;
+                const modelId = result.fragments.modelId;
+                const localId = result.localId;
+                const modelIdMap = { [modelId]: new Set([localId]) };
+                const guids = await fragmentsRef.current?.modelIdMapToGuids(modelIdMap);
+                console.log("GUIDs:", guids);
+                if (!guids) return;
+                for (const guid of guids) {
+                    if (selectedElementIndividually.has(guid)) {
+                        setSelectedElementIndividually(new Set([...selectedElementIndividually].filter(id => id !== guid)));
+                        await fragmentsRef.current?.resetHighlight(modelIdMap);
+                        return ;
+                    }
+                    setSelectedElementIndividually(new Set([...selectedElementIndividually, guid]));
+                    await fragmentsRef.current?.highlight({
+                        color: new THREE.Color("red"),
+                        renderedFaces: RenderedFaces.ONE,
+                        opacity: 0.5,
+                        transparent: false,
+                    }, modelIdMap);
+                }
+    }
     return (
         <div className="">
             <input
@@ -283,24 +308,7 @@ export function IfcTest() {
 
             <div ref={containerRef} 
             className='relative h-[70dvh] rounded-lg border border-gray-200 shadow-lg overflow-hidden'
-            onDoubleClick={async () => {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const result = (await casterRef.current?.castRay()) as any;
-                if (!result) return;
-                const modelId = result.fragments.modelId;
-                const localId = result.localId;
-                const modelIdMap = { [modelId]: new Set([localId]) };
-                const guids = await fragmentsRef.current?.modelIdMapToGuids(modelIdMap);
-                console.log("GUIDs:", guids);
-                await fragmentsRef.current?.highlight({
-                    color: new THREE.Color("red"),
-                    renderedFaces: RenderedFaces.ONE,
-                    opacity: 0.5,
-                    transparent: false,
-                }, modelIdMap);
-                console.log("Clicked on item with modelIdMap:", modelIdMap);
-            }} />
-
+            onDoubleClick={selectedElementIndividuallyMarker} />
             {/* Enhanced Data Display */}
             <div className="mt-6 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
                 <div className="bg-linear-to-r from-blue-600 to-blue-700 px-6 py-4">
