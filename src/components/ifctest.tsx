@@ -110,103 +110,14 @@ export function IfcTest() {
                     body: form
                 })
             });
-
-            // const finder = components.get(OBC.ItemsFinder);
-            // finder.create("WALL", [{ categories: [/WALL/] }]);
-            // finder.create("DOOR", [{ categories: [/DOOR/] }]);
-            // finder.create("WINDOW", [{ categories: [/WINDOW/] }]);
-            // finder.create("SLAB", [{ categories: [/SLAB/] }]);
-            // finder.create("FURNISHING", [{ categories: [/FURNISHING/] }]);
-            // finder.create("ROOF", [{ categories: [/ROOF/] }]);
-
             if (!isInitializedRef.current) {
                 BUI.Manager.init();
                 isInitializedRef.current = true;
             }
-
-            // const queriesList =
-            //     BUI.Component.create<BUI.Table<TQueriesListTableData>>(() => queriesListTemplate(finder));
-
-            // queriesList.style.maxHeight = "25rem";
-            // queriesList.columns = ["Name", { name: "Actions", width: "auto" }];
-            // queriesList.noIndentation = true;
-            // queriesList.headersHidden = true;
-            // queriesList.dataTransform = {
-            //     Actions: (_, rowData) => {
-            //         const { Name } = rowData;
-            //         if (!Name) return _;
-
-            //         const hider = components.get(OBC.Hider);
-            //         const onClick = async ({ target }: { target: BUI.Button }) => {
-            //             target.loading = true;
-            //             const modelIdMap = await getFinderFilterResult(Name, finder);
-            //             await hider.isolate(modelIdMap);
-            //             target.loading = false;
-            //         };
-
-            //         return BUI.html`<bim-button icon="solar:cursor-bold" @click=${onClick}></bim-button>`;
-            //     },
-            // };
-
-            // const panel = BUI.Component.create<BUI.PanelSection>(() => {
-            //     const onResetVisibility = async ({ target }: { target: BUI.Button }) => {
-            //         target.loading = true;
-            //         const hider = components.get(OBC.Hider);
-            //         await hider.set(true);
-            //         target.loading = false;
-            //     };
-
-            // return BUI.html`
-            //     <bim-panel active label="Items Finder Tutorial" class="options-menu">
-            //     <bim-panel-section style="min-width: 14rem" label="General">
-            //         <bim-button label="Reset Visibility" @click=${onResetVisibility}></bim-button>
-            //     </bim-panel-section>
-            //     <bim-panel-section label="Queries">
-            //         ${queriesList}
-            //     </bim-panel-section>
-            //     </bim-panel>
-            // `;
-            // });
-            // check if panel already exists in the document
             const existingPanel = document.body.querySelector('.options-menu');
             if (existingPanel) {
                 existingPanel.remove();
             }
-            // panel.style.position = "absolute";
-            // panel.style.top = "1rem";
-            // panel.style.right = "1rem";
-            // panel.style.zIndex = "10";        // above the canvas
-            // panel.classList.add("options-menu");
-            // (containerRef.current as HTMLElement).append(panel);
-            // document.body.append(panel);
-
-
-
-            // const onSelectCallback = async (modelIdMap: { [x: number]: Set<any> }, attrs?: FRAGS.ItemData) => {
-            //     const modelId = Object.keys(modelIdMap)[0];
-            //     if (modelId && fragments.list.get(modelId)) {
-            //         const model = fragments.list.get(modelId)!;
-            //         const [data] = await model.getItemsData([...modelIdMap[modelId]]);
-            //         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            //         attrs = data;
-            //     }
-
-            //     await fragments.highlight(
-            //         {
-            //         color: COLOR_PURPLE,
-            //         renderedFaces: FRAGS.RenderedFaces.ONE,
-            //         opacity: 1,
-            //         transparent: false,
-            //         },
-            //         modelIdMap,
-            //     );
-
-            //     await fragments.core.update(true);
-
-            //     // onItemSelected();
-            // };
-
-
         }
         init();
         return () => {
