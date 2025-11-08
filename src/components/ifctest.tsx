@@ -137,12 +137,6 @@ export function IfcTest() {
         mutationFn: async (params: ElementSelectionParams) => {
             const key = `${params.element_type}-${params.level_name}`;
             const to_remove = selectedElements.has(key)
-            if (to_remove) {
-                selectedElements.delete(key);
-                setSelectedElements(new Set([...selectedElements]))
-            } else {
-                setSelectedElements(new Set([...selectedElements, key]));
-            }
             const form = new FormData();
             form.append("element_type", params.element_type);
             form.append("level_name", params.level_name);
@@ -161,9 +155,12 @@ export function IfcTest() {
             const modelIdMap = await fragmentsRef.current?.guidsToModelIdMap(validateData.data.guids)
             if (!modelIdMap) return;
             if (to_remove) {
+                selectedElements.delete(key);
+                setSelectedElements(new Set([...selectedElements]))
                 await fragmentsRef.current?.resetHighlight(modelIdMap);
                 return;
             }
+            setSelectedElements(new Set([...selectedElements, key]));
             await fragmentsRef.current?.highlight({
                 color: new THREE.Color("purple"),
                 renderedFaces: RenderedFaces.ONE,
