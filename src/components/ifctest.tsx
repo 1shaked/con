@@ -6,10 +6,10 @@ import * as BUI from "@thatopen/ui";
 import * as THREE from "three";
 import { RenderedFaces } from '@thatopen/fragments';
 import { loadIFCFile } from '../utils/Load_IFC_File';
-import { getFinderFilterResult } from '../utils/Get_Finder_Filter_Result';
-import type { TQueriesListTableData } from '../types/QueriesListTableData';
-import { queriesListTemplate } from '../utils/Queries_List_Template';
-import { useQuery } from '@tanstack/react-query';
+// import { getFinderFilterResult } from '../utils/Get_Finder_Filter_Result';
+// import type { TQueriesListTableData } from '../types/QueriesListTableData';
+// import { queriesListTemplate } from '../utils/Queries_List_Template';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { URL_SERVER } from '../consts';
 import { Server_File_Info_Schema } from '../validators/Server_File_Info_Schema';
 import { Server_GUIDS_For_Type_Schema } from '../validators/Server_GUIDS_For_Type';
@@ -110,73 +110,73 @@ export function IfcTest() {
                 })
             });
 
-            const finder = components.get(OBC.ItemsFinder);
-            finder.create("WALL", [{ categories: [/WALL/] }]);
-            finder.create("DOOR", [{ categories: [/DOOR/] }]);
-            finder.create("WINDOW", [{ categories: [/WINDOW/] }]);
-            finder.create("SLAB", [{ categories: [/SLAB/] }]);
-            finder.create("FURNISHING", [{ categories: [/FURNISHING/] }]);
-            finder.create("ROOF", [{ categories: [/ROOF/] }]);
+            // const finder = components.get(OBC.ItemsFinder);
+            // finder.create("WALL", [{ categories: [/WALL/] }]);
+            // finder.create("DOOR", [{ categories: [/DOOR/] }]);
+            // finder.create("WINDOW", [{ categories: [/WINDOW/] }]);
+            // finder.create("SLAB", [{ categories: [/SLAB/] }]);
+            // finder.create("FURNISHING", [{ categories: [/FURNISHING/] }]);
+            // finder.create("ROOF", [{ categories: [/ROOF/] }]);
 
             if (!isInitializedRef.current) {
                 BUI.Manager.init();
                 isInitializedRef.current = true;
             }
 
-            const queriesList =
-                BUI.Component.create<BUI.Table<TQueriesListTableData>>(() => queriesListTemplate(finder));
+            // const queriesList =
+            //     BUI.Component.create<BUI.Table<TQueriesListTableData>>(() => queriesListTemplate(finder));
 
-            queriesList.style.maxHeight = "25rem";
-            queriesList.columns = ["Name", { name: "Actions", width: "auto" }];
-            queriesList.noIndentation = true;
-            queriesList.headersHidden = true;
-            queriesList.dataTransform = {
-                Actions: (_, rowData) => {
-                    const { Name } = rowData;
-                    if (!Name) return _;
+            // queriesList.style.maxHeight = "25rem";
+            // queriesList.columns = ["Name", { name: "Actions", width: "auto" }];
+            // queriesList.noIndentation = true;
+            // queriesList.headersHidden = true;
+            // queriesList.dataTransform = {
+            //     Actions: (_, rowData) => {
+            //         const { Name } = rowData;
+            //         if (!Name) return _;
 
-                    const hider = components.get(OBC.Hider);
-                    const onClick = async ({ target }: { target: BUI.Button }) => {
-                        target.loading = true;
-                        const modelIdMap = await getFinderFilterResult(Name, finder);
-                        await hider.isolate(modelIdMap);
-                        target.loading = false;
-                    };
+            //         const hider = components.get(OBC.Hider);
+            //         const onClick = async ({ target }: { target: BUI.Button }) => {
+            //             target.loading = true;
+            //             const modelIdMap = await getFinderFilterResult(Name, finder);
+            //             await hider.isolate(modelIdMap);
+            //             target.loading = false;
+            //         };
 
-                    return BUI.html`<bim-button icon="solar:cursor-bold" @click=${onClick}></bim-button>`;
-                },
-            };
+            //         return BUI.html`<bim-button icon="solar:cursor-bold" @click=${onClick}></bim-button>`;
+            //     },
+            // };
 
-            const panel = BUI.Component.create<BUI.PanelSection>(() => {
-                const onResetVisibility = async ({ target }: { target: BUI.Button }) => {
-                    target.loading = true;
-                    const hider = components.get(OBC.Hider);
-                    await hider.set(true);
-                    target.loading = false;
-                };
+            // const panel = BUI.Component.create<BUI.PanelSection>(() => {
+            //     const onResetVisibility = async ({ target }: { target: BUI.Button }) => {
+            //         target.loading = true;
+            //         const hider = components.get(OBC.Hider);
+            //         await hider.set(true);
+            //         target.loading = false;
+            //     };
 
-                return BUI.html`
-                    <bim-panel active label="Items Finder Tutorial" class="options-menu">
-                    <bim-panel-section style="min-width: 14rem" label="General">
-                        <bim-button label="Reset Visibility" @click=${onResetVisibility}></bim-button>
-                    </bim-panel-section>
-                    <bim-panel-section label="Queries">
-                        ${queriesList}
-                    </bim-panel-section>
-                    </bim-panel>
-                `;
-            });
+                // return BUI.html`
+                //     <bim-panel active label="Items Finder Tutorial" class="options-menu">
+                //     <bim-panel-section style="min-width: 14rem" label="General">
+                //         <bim-button label="Reset Visibility" @click=${onResetVisibility}></bim-button>
+                //     </bim-panel-section>
+                //     <bim-panel-section label="Queries">
+                //         ${queriesList}
+                //     </bim-panel-section>
+                //     </bim-panel>
+                // `;
+            // });
             // check if panel already exists in the document
             const existingPanel = document.body.querySelector('.options-menu');
             if (existingPanel) {
                 existingPanel.remove();
             }
-            panel.style.position = "absolute";
-            panel.style.top = "1rem";
-            panel.style.right = "1rem";
-            panel.style.zIndex = "10";        // above the canvas
-            panel.classList.add("options-menu");
-            (containerRef.current as HTMLElement).append(panel);
+            // panel.style.position = "absolute";
+            // panel.style.top = "1rem";
+            // panel.style.right = "1rem";
+            // panel.style.zIndex = "10";        // above the canvas
+            // panel.classList.add("options-menu");
+            // (containerRef.current as HTMLElement).append(panel);
             // document.body.append(panel);
 
 
@@ -217,36 +217,81 @@ export function IfcTest() {
 
 
     }, []);
-    async function selectElement(element_type: string , level_name: string, ifc_file: Blob, to_remove: boolean = false) {
-        const form = new FormData();
-        form.append("element_type", element_type);
-        form.append("level_name", level_name);
-        form.append("ifc_file", ifc_file);
-        const res = await fetch(`${URL_SERVER}get_guids/`, {
-            method: 'POST',
-            body: form
-        });
-        const data = await res.json();
-        const validateData = Server_GUIDS_For_Type_Schema.safeParse(data);
-        if (!validateData.success) {
-            console.error("Invalid data:", validateData.error);
-            return;
-        }
-        console.log("Validated GUIDs Data:", validateData.data);
-        const modelIdMap = await fragmentsRef.current?.guidsToModelIdMap(validateData.data.guids)
-        if (!modelIdMap) return ;
-        if (to_remove) {
-            await fragmentsRef.current?.resetHighlight(modelIdMap);
-            return ;
-        }
-        await fragmentsRef.current?.highlight({
-            color: new THREE.Color("purple"),
-            renderedFaces: RenderedFaces.ONE,
-            opacity: 0.5,
-            transparent: false
-        }, modelIdMap);
+    interface ElementSelectionParams {
+        element_type: string;
+        level_name: string;
+        ifc_file: Blob;
     }
-    
+    const element_details_mutation = useMutation({
+        mutationKey: ['element_details'],
+        mutationFn: async (params: ElementSelectionParams) => {
+            const key = `${params.element_type}-${params.level_name}`;
+            const to_remove = selectedElements.has(key)
+            if (to_remove ) {
+                selectedElements.delete(key);
+                setSelectedElements(new Set([...selectedElements]))
+            } else {
+                setSelectedElements(new Set([...selectedElements, key]));
+            }
+            const form = new FormData();
+            form.append("element_type", params.element_type);
+            form.append("level_name", params.level_name);
+            form.append("ifc_file", params.ifc_file);
+            const res = await fetch(`${URL_SERVER}get_guids/`, {
+                method: 'POST',
+                body: form
+            });
+            const data = await res.json();
+            const validateData = Server_GUIDS_For_Type_Schema.safeParse(data);
+            if (!validateData.success) {
+                console.error("Invalid data:", validateData.error);
+                return;
+            }
+            console.log("Validated GUIDs Data:", validateData.data);
+            const modelIdMap = await fragmentsRef.current?.guidsToModelIdMap(validateData.data.guids)
+            if (!modelIdMap) return;
+            if (to_remove) {
+                await fragmentsRef.current?.resetHighlight(modelIdMap);
+                return;
+            }
+            await fragmentsRef.current?.highlight({
+                color: new THREE.Color("purple"),
+                renderedFaces: RenderedFaces.ONE,
+                opacity: 0.5,
+                transparent: false
+            }, modelIdMap);
+        }
+    })
+    // async function selectElement(element_type: string, level_name: string, ifc_file: Blob, to_remove: boolean = false) {
+    //     const form = new FormData();
+    //     form.append("element_type", element_type);
+    //     form.append("level_name", level_name);
+    //     form.append("ifc_file", ifc_file);
+    //     const res = await fetch(`${URL_SERVER}get_guids/`, {
+    //         method: 'POST',
+    //         body: form
+    //     });
+    //     const data = await res.json();
+    //     const validateData = Server_GUIDS_For_Type_Schema.safeParse(data);
+    //     if (!validateData.success) {
+    //         console.error("Invalid data:", validateData.error);
+    //         return;
+    //     }
+    //     console.log("Validated GUIDs Data:", validateData.data);
+    //     const modelIdMap = await fragmentsRef.current?.guidsToModelIdMap(validateData.data.guids)
+    //     if (!modelIdMap) return;
+    //     if (to_remove) {
+    //         await fragmentsRef.current?.resetHighlight(modelIdMap);
+    //         return;
+    //     }
+    //     await fragmentsRef.current?.highlight({
+    //         color: new THREE.Color("purple"),
+    //         renderedFaces: RenderedFaces.ONE,
+    //         opacity: 0.5,
+    //         transparent: false
+    //     }, modelIdMap);
+    // }
+
     return (
         <div className="">
             <input
@@ -263,7 +308,7 @@ export function IfcTest() {
                     disabled:opacity-50
                 "
             />
-            
+
             <div ref={containerRef} className='relative h-[70dvh] rounded-lg border border-gray-200 shadow-lg overflow-hidden' />
 
             {/* Enhanced Data Display */}
@@ -273,7 +318,7 @@ export function IfcTest() {
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                         </svg>
-                        Building Elements Summary
+                        Building Elements Summary {element_details_mutation.isPending ? ' - Updating...' : ''}
                     </h3>
                     <p className="text-blue-100 text-sm mt-1">
                         {model_data.data?.data.length || 0} element types found
@@ -306,20 +351,35 @@ export function IfcTest() {
                                         <div className="flex-1">
                                             <h4 className={`font-semibold text-gray-900 group-hover:text-blue-700 
                                                          text-lg leading-tight ${selectedElements.has(`${row.Element_Type}-${row.Level}`) ? 'text-blue-700' : ''}`}
-                                                         onClick={() => {
-                                                            const key = `${row.Element_Type}-${row.Level}`;
-                                                            if (selectedElements.has(key)) {
-                                                                selectedElements.delete(key);
-                                                                setSelectedElements(new Set([...selectedElements]));
-                                                                selectElement(row.Element_Type, row.Level ?? '', file as Blob, true)
+                                                onClick={() => {
+                                                    // const key = `${row.Element_Type}-${row.Level}`;
+                                                    element_details_mutation.mutate({
+                                                            element_type: row.Element_Type,
+                                                            level_name: row.Level ?? '',
+                                                            ifc_file: file as Blob,
+                                                        })
+                                                    // if (selectedElements.has(key)) {
+                                                        // selectedElements.delete(key);
+                                                        // setSelectedElements(new Set([...selectedElements]));
+                                                        // element_details_mutation.mutate({
+                                                        //     element_type: row.Element_Type,
+                                                        //     level_name: row.Level ?? '',
+                                                        //     ifc_file: file as Blob,
+                                                        // })
+                                                        // selectElement(row.Element_Type, row.Level ?? '', file as Blob, true)
 
-                                                            } else {
-                                                                setSelectedElements(new Set([...selectedElements, key]));
-                                                                selectElement(row.Element_Type, row.Level ?? '', file as Blob)
-                                                            }
-                                                        }
-                                                            
-                                                        }>
+                                                    // } else {
+                                                        // setSelectedElements(new Set([...selectedElements, key]));
+                                                    //     selectElement(row.Element_Type, row.Level ?? '', file as Blob)
+                                                    //     element_details_mutation.mutate({
+                                                    //         element_type: row.Element_Type,
+                                                    //         level_name: row.Level ?? '',
+                                                    //         ifc_file: file as Blob,
+                                                    //     })
+                                                    // }
+                                                }
+
+                                                }>
                                                 {row.Element_Type}
                                             </h4>
                                             <div className="flex items-center gap-2 mt-2">
