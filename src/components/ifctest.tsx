@@ -204,6 +204,7 @@ export function IfcTest() {
 
             //     // onItemSelected();
             // };
+            
 
         }
         init();
@@ -280,7 +281,25 @@ export function IfcTest() {
                 "
             />
 
-            <div ref={containerRef} className='relative h-[70dvh] rounded-lg border border-gray-200 shadow-lg overflow-hidden' />
+            <div ref={containerRef} 
+            className='relative h-[70dvh] rounded-lg border border-gray-200 shadow-lg overflow-hidden'
+            onDoubleClick={async () => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const result = (await casterRef.current?.castRay()) as any;
+                if (!result) return;
+                const modelId = result.fragments.modelId;
+                const localId = result.localId;
+                const modelIdMap = { [modelId]: new Set([localId]) };
+                const guids = await fragmentsRef.current?.modelIdMapToGuids(modelIdMap);
+                console.log("GUIDs:", guids);
+                await fragmentsRef.current?.highlight({
+                    color: new THREE.Color("red"),
+                    renderedFaces: RenderedFaces.ONE,
+                    opacity: 0.5,
+                    transparent: false,
+                }, modelIdMap);
+                console.log("Clicked on item with modelIdMap:", modelIdMap);
+            }} />
 
             {/* Enhanced Data Display */}
             <div className="mt-6 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
