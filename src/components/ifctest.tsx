@@ -1,14 +1,8 @@
 import { useRef, useEffect, useState } from 'react';
 import * as OBC from "@thatopen/components";
-// import * as FRAGS from "@thatopen/fragments";
-// import * as THREE from "three";
-import * as BUI from "@thatopen/ui";
 import * as THREE from "three";
 import { RenderedFaces } from '@thatopen/fragments';
 import { loadIFCFile } from '../utils/Load_IFC_File';
-// import { getFinderFilterResult } from '../utils/Get_Finder_Filter_Result';
-// import type { TQueriesListTableData } from '../types/QueriesListTableData';
-// import { queriesListTemplate } from '../utils/Queries_List_Template';
 import { useMutation } from '@tanstack/react-query';
 import { COLORS_SET, URL_SERVER } from '../consts';
 import { Server_File_Info_Schema } from '../validators/Server_File_Info_Schema';
@@ -19,7 +13,6 @@ import type { TIFCTable } from '../validators/IFC_Table_Schema';
 
 export function IfcTest() {
     const containerRef = useRef(null);
-    const isInitializedRef = useRef(false);
     const componentsRef = useRef<OBC.Components | null>(null);
     const worldRef = useRef<OBC.Worlds | null>(null);
     const fragmentsRef = useRef<OBC.FragmentsManager | null>(null);
@@ -32,11 +25,13 @@ export function IfcTest() {
     const [tableData, setTableData] = useState<TIFCTable>([]);
     const model_data = useMutation({
         mutationKey: ['model_data', fileName],
-        mutationFn: async () => {
+        mutationFn: async (fileParam: File) => {
             if (!fileName) return { file: '', data: [] };
-            // const res = await fetch(`${URL_SERVER}file/${fileName}`);
+            // const res = await fetch(`${URL_SERVER}file/${fileName}`)
+            if (!ifcLoaderRef.current) throw new Error("IFC Loader not initialized");
+            await loadIFCFile(fileParam, ifcLoaderRef.current, fileParam.name);
             const form = new FormData();
-            form.append("ifc_file", file as Blob);
+            form.append("ifc_file", fileParam as Blob);
             const res_upload = await fetch(`${URL_SERVER}upload_ifc/`, {
                 method: 'POST',
                 body: form
@@ -105,25 +100,6 @@ export function IfcTest() {
                     absolute: true,
                 },
             });
-
-            // when a file is selected, load it
-            const input = document.getElementById("ifcInput");
-            input?.addEventListener("change", async (e) => {
-                const file = (e.target as HTMLInputElement).files?.[0];
-                if (!file) return;
-                setFile(file);
-                await loadIFCFile(file, ifcLoader, file.name);
-                const form = new FormData();
-                form.append("ifc_file", file);
-                await fetch(`${URL_SERVER}upload_ifc/`, {
-                    method: 'POST',
-                    body: form
-                })
-            });
-            if (!isInitializedRef.current) {
-                BUI.Manager.init();
-                isInitializedRef.current = true;
-            }
             const existingPanel = document.body.querySelector('.options-menu');
             if (existingPanel) {
                 existingPanel.remove();
@@ -222,6 +198,13 @@ export function IfcTest() {
                     focus:outline-none focus:ring-2 focus:ring-blue-500/60
                     disabled:opacity-50
                 "
+                onChange={async (e) => {
+                    const file = (e.target as HTMLInputElement).files?.[0];
+                    if (!file || !ifcLoaderRef.current) return;
+                    setFile(file);
+                    // await loadIFCFile(file, ifcLoaderRef.current, file.name);
+                    model_data.mutate(file);
+                }}
             />
 
             <div ref={containerRef}
