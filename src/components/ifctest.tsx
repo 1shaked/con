@@ -79,7 +79,7 @@ export function IfcTest() {
 
             const fragments = components.get(OBC.FragmentsManager);
             fragmentsRef.current = fragments;
-            fragments.init("/src/worker.mjs");
+            fragments.init("/worker.mjs");
 
             // set fragment that when a model is added, it is added to the scene and linked to the camera
             fragments.list.onItemSet.add(({ value: model }) => {
