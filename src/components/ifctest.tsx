@@ -16,22 +16,23 @@ import { Server_GUIDS_For_Type_Schema } from '../validators/Server_GUIDS_For_Typ
 import type { ElementSelectionParams } from '../types/ElementSelectionParams';
 
 const COLORS_SET = [
-    '#062c5b',
-    '#fee7b1',
-    '#4c2c15',
-    '#a89dde',
-    '#9dd3de',
-    '#828961',
-    '#3a3c32',
-    '#c3c3c3',
-    '#d6612b',
-    '#73e6aa',
-    '#83a5f9',
-    '#ad56f9',
-    '#f01236',
-    '#f9d423',
-    '#cccccc',
-]
+    "rgba(6, 44, 91, 0.5)",       // '#062c5b'
+    "rgba(254, 231, 177, 0.5)",   // '#fee7b1'
+    "rgba(76, 44, 21, 0.5)",      // '#4c2c15'
+    "rgba(168, 157, 222, 0.5)",   // '#a89dde'
+    "rgba(157, 211, 222, 0.5)",   // '#9dd3de'
+    "rgba(130, 137, 97, 0.5)",    // '#828961'
+    "rgba(58, 60, 50, 0.5)",      // '#3a3c32'
+    "rgba(195, 195, 195, 0.5)",   // '#c3c3c3'
+    "rgba(214, 97, 43, 0.5)",     // '#d6612b'
+    "rgba(115, 230, 170, 0.5)",   // '#73e6aa'
+    "rgba(131, 165, 249, 0.5)",   // '#83a5f9'
+    "rgba(173, 86, 249, 0.5)",    // '#ad56f9'
+    "rgba(240, 18, 54, 0.5)",     // '#f01236'
+    "rgba(249, 212, 35, 0.5)",    // '#f9d423'
+    "rgba(204, 204, 204, 0.5)",   // '#cccccc'
+];
+
 
 export function IfcTest() {
     const containerRef = useRef(null);
@@ -264,21 +265,24 @@ export function IfcTest() {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {model_data.data?.data.map((row,) => (
+                            {model_data.data?.data.map((row, index) => (
                                 <div
                                     key={`${row.Element_Type}-${row.Level}`}
                                     className={`group bg-linear-to-br from-gray-50 to-gray-100
                                              border border-gray-200 hover:border-blue-300 rounded-lg p-4 
                                              transform hover:scale-105 transition-all duration-200 
                                              hover:shadow-md cursor-pointer
-                                             ${selectedElements.has(`${row.Element_Type}-${row.Level}`) ? 'shadow-lg shadow-blue-500/25 border-blue-400 bg-linear-to-br from-green-500 to-green-50' : ''}`}
+                                             ${selectedElements.has(`${row.Element_Type}-${row.Level}`) ? `shadow-lg shadow-blue-500/25 bg-[${COLORS_SET[index % COLORS_SET.length]}]` : ''}`}
+                                style={{
+                                    background: selectedElements.has(`${row.Element_Type}-${row.Level}`) ? COLORS_SET[index % COLORS_SET.length] : '',
+                                }}
                                 >
                                     <div className="flex items-start justify-between mb-3">
                                         <div className="flex-1">
                                             <h4 className={`font-semibold text-gray-900 group-hover:text-blue-700 
                                                          text-lg leading-tight ${selectedElements.has(`${row.Element_Type}-${row.Level}`) ? 'text-blue-700' : ''}`}
                                             >
-                                                {row.Element_Type}
+                                                {row.Element_Type} {COLORS_SET[index % COLORS_SET.length]}
                                             </h4>
                                             <div className="flex items-center gap-2 mt-2">
                                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full 
