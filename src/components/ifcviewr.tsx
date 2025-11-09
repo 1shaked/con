@@ -1,8 +1,6 @@
 import { useRef, useEffect } from 'react';
 import * as OBC from "@thatopen/components";
 import * as FRAGS from "@thatopen/fragments";
-import * as THREE from "three";
-import * as BUI from "@thatopen/ui";
 
 export function IfcViewer() {
     const containerRef = useRef(null);
@@ -37,7 +35,7 @@ export function IfcViewer() {
             };
 
             // Setup Fragments
-            const fragments = new FRAGS.FragmentsModels("/src/worker.mjs");
+            const fragments = new FRAGS.FragmentsModels("/worker.mjs");
             world.camera.controls?.addEventListener("rest", () => fragments.update(true));
             
             // Setup file input handler
