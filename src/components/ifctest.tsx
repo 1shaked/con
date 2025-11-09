@@ -15,6 +15,23 @@ import { Server_File_Info_Schema } from '../validators/Server_File_Info_Schema';
 import { Server_GUIDS_For_Type_Schema } from '../validators/Server_GUIDS_For_Type';
 import type { ElementSelectionParams } from '../types/ElementSelectionParams';
 
+const COLORS_SET = [
+    '#062c5b',
+    '#fee7b1',
+    '#4c2c15',
+    '#a89dde',
+    '#9dd3de',
+    '#828961',
+    '#3a3c32',
+    '#c3c3c3',
+    '#d6612b',
+    '#73e6aa',
+    '#83a5f9',
+    '#ad56f9',
+    '#f01236',
+    '#f9d423',
+    '#cccccc',
+]
 
 export function IfcTest() {
     const containerRef = useRef(null);
@@ -139,7 +156,7 @@ export function IfcTest() {
             const to_remove = selectedElements.has(key)
             const form = new FormData();
             form.append("element_type", params.element_type);
-            form.append("level_name", params.level_name);
+            form.append("level_name", params.level_name ?? 'UNKNOWN');
             form.append("ifc_file", params.ifc_file);
             const res = await fetch(`${URL_SERVER}get_guids/`, {
                 method: 'POST',
@@ -161,10 +178,13 @@ export function IfcTest() {
                 return;
             }
             setSelectedElements(new Set([...selectedElements, key]));
+            // select a color from the color set based on the number of selected elements
+            const colorIndex = selectedElements.size % COLORS_SET.length;
+            const color = COLORS_SET[colorIndex];
             await fragmentsRef.current?.highlight({
-                color: new THREE.Color("purple"),
+                color: new THREE.Color(color),
                 renderedFaces: RenderedFaces.ONE,
-                opacity: 0.5,
+                opacity: 0.75,
                 transparent: false
             }, modelIdMap);
         }
