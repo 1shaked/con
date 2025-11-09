@@ -9,14 +9,13 @@ import { loadIFCFile } from '../utils/Load_IFC_File';
 // import { getFinderFilterResult } from '../utils/Get_Finder_Filter_Result';
 // import type { TQueriesListTableData } from '../types/QueriesListTableData';
 // import { queriesListTemplate } from '../utils/Queries_List_Template';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { COLORS_SET, URL_SERVER } from '../consts';
 import { Server_File_Info_Schema } from '../validators/Server_File_Info_Schema';
 import { Server_GUIDS_For_Type_Schema } from '../validators/Server_GUIDS_For_Type';
 import type { ElementSelectionParams } from '../types/ElementSelectionParams';
 import { hexToRgba } from '../utils/Hex_To_RGBA';
-
-
+import type { TIFCTable } from '../validators/IFC_Table_Schema';
 
 export function IfcTest() {
     const containerRef = useRef(null);
@@ -30,18 +29,26 @@ export function IfcTest() {
     const [file, setFile] = useState<File | null>(null);
     // get the file name
     const fileName = file ? file.name : null;
-    const model_data = useQuery({
-        queryKey: ['model_data', fileName],
-        queryFn: async () => {
+    const [tableData, setTableData] = useState<TIFCTable>([]);
+    const model_data = useMutation({
+        mutationKey: ['model_data', fileName],
+        mutationFn: async () => {
             if (!fileName) return { file: '', data: [] };
-            const res = await fetch(`${URL_SERVER}file/${fileName}`);
-            const data = await res.json();
+            // const res = await fetch(`${URL_SERVER}file/${fileName}`);
+            const form = new FormData();
+            form.append("ifc_file", file as Blob);
+            const res_upload = await fetch(`${URL_SERVER}upload_ifc/`, {
+                method: 'POST',
+                body: form
+            })
+            const data = await res_upload.json();
             // validate the data
             const result = Server_File_Info_Schema.safeParse(data);
             if (!result.success) {
                 console.error("Invalid data:", result.error);
                 throw new Error("Invalid data");
             }
+            setTableData(result.data.data);
             return result.data;
         }
     })
@@ -233,12 +240,12 @@ export function IfcTest() {
                         </> : ''}
                     </h3>
                     <p className="text-blue-100 text-sm mt-1">
-                        {model_data.data?.data.length || 0} element types found
+                        {tableData.length || 0} element types found
                     </p>
                 </div>
 
                 <div className="p-6">
-                    {model_data.isLoading ? (
+                    {model_data.isPending ? (
                         <div className="flex items-center justify-center py-12">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                             <span className="ml-3 text-gray-600">Loading elements...</span>
@@ -250,7 +257,7 @@ export function IfcTest() {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {model_data.data?.data.map((row, index) => (
+                            {tableData.map((row, index) => (
                                 <div
                                     key={`${row.Element_Type}-${row.Level}`}
                                     className={` bg-linear-to-br from-gray-50 to-gray-100 group 
@@ -317,7 +324,7 @@ export function IfcTest() {
                         </div>
                     )}
 
-                    {model_data.data?.data.length === 0 && !model_data.isLoading && (
+                    {tableData.length === 0 && !model_data.isPending && (
                         <div className="text-center py-12">
                             <div className="text-gray-400 text-6xl mb-4">📋</div>
                             <h3 className="text-lg font-medium text-gray-900 mb-2">No elements found</h3>
