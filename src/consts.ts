@@ -2,7 +2,9 @@ import {Color} from "three";
 // import  from "three";
 
 export const COLOR_PURPLE = new Color("purple");
-export const URL_SERVER = 'http://127.0.0.1:8000/';
+// if dev server is running on different port, change it here
+
+export const URL_SERVER = '/api/';
 
 export const COLORS_SET = [
     "#062c5b",       // '#062c5b'
